@@ -20,11 +20,18 @@ namespace apkfmt::res {
     }
 
     void Ro::groupResources() {
-        const std::string groupDir{"FmtRes"};
-
+        const std::string groupDir{"fmtres"};
         static std::array<std::string, 1> clusterFiles{
             "AndroidManifest.xml"
         };
+        std::vector<std::string> remain;
+        for (const auto& copyable : clusterFiles) {
+            if (!exists(workDir / groupDir / copyable)) {
+                remain.push_back(copyable);
+            }
+        }
+        if (remain.empty())
+            return;
 
         for (const auto& target : content) {
             bool chosen{};
@@ -43,6 +50,12 @@ namespace apkfmt::res {
             copy_file(target, destFile);
             Validate::collideFiles(target, destFile);
             std::filesystem::remove(target);
+
+            std::erase_if(remain, [&](const auto& moveable) {
+                return moveable == target.filename();
+            });
+            if (remain.empty())
+                break;
         }
     }
 }
