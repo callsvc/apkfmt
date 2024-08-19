@@ -7,6 +7,8 @@ target_sources(apkfmt PRIVATE
     res/manifest.h
     res/ro.cpp
     res/ro.h
+    arsc/verify.cpp
+    arsc/verify.h
     repack.cpp
     repack.h
     holder.cpp

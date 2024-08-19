@@ -2,6 +2,7 @@
 #include <ranges>
 
 #include <res/ro.h>
+#include <arsc/verify.h>
 #include <validate.h>
 namespace apkfmt::res {
     Ro::Ro(const std::filesystem::path& androidPath)
@@ -20,9 +21,8 @@ namespace apkfmt::res {
     }
 
     void Ro::groupResources() {
-        const std::string groupDir{"fmtres"};
-        static std::array<std::string, 1> clusterFiles{
-            "AndroidManifest.xml"
+        static std::array clusterFiles{
+            manifestAlias
         };
         std::vector<std::string> remain;
         for (const auto& copyable : clusterFiles) {
@@ -57,5 +57,37 @@ namespace apkfmt::res {
             if (remain.empty())
                 break;
         }
+    }
+    void Ro::rollback() const {
+        const std::filesystem::directory_iterator walker(workDir / groupDir);
+        for (const auto& entry : walker) {
+            const auto mimic{workDir / entry.path().filename()};
+            if (exists(mimic)) {
+                std::filesystem::remove(mimic);
+            }
+            copy_file(entry, mimic);
+            Validate::collideFiles(entry, mimic);
+        }
+
+        remove_all(workDir / groupDir);
+    }
+
+    void Ro::deobfuscate() {
+        const std::filesystem::path manifest{workDir / groupDir / manifestAlias};
+        treatManifest(manifest);
+    }
+
+    void Ro::treatManifest(const std::filesystem::path& manifest) {
+        if (!exists(manifest))
+            return;
+        std::vector<std::filesystem::path> files;
+        files.push_back(manifest);
+        if (arsc::Verify::hasResources(content)) {
+            files.push_back(workDir / "resources.arsc");
+        }
+
+        android = Manifest(files);
+        // android.decode();
+        android.save(workDir / manifestAlias);
     }
 }

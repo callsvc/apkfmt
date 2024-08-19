@@ -14,9 +14,12 @@ auto main(const i32 argc, char** argv) -> i32 {
     Repack repack{holder};
 
     repack.unpack();
-    res::Ro readOnlyOutput{holder.output};
-    readOnlyOutput.groupResources();
-    // repack.pack();
+    res::Ro readOnlyDir{holder.output};
+    readOnlyDir.groupResources();
+    readOnlyDir.deobfuscate();
+
+    readOnlyDir.rollback();
+    repack.pack();
 
     return {};
 }
