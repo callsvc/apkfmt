@@ -12,6 +12,6 @@ namespace apkfmt {
         static void increaseFSz(const std::filesystem::path& stream, u64 size);
 
         std::filesystem::path apk;
-        std::filesystem::path output{"ApkOut"};
+        std::filesystem::path output{"fmtout"};
     };
 }

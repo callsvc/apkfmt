@@ -26,4 +26,14 @@ namespace apkfmt {
 
         mbedtls_sha256_free(&aes);
     }
+
+    void Validate::collideFiles(const std::filesystem::path& dest, const std::filesystem::path& src) {
+        std::stringstream destStream;
+        std::stringstream srcStream;
+
+        doChecksum(destStream, dest);
+        doChecksum(srcStream, src);
+        if (destStream.str() != srcStream.str())
+            throw std::runtime_error("Destination and src are different");
+    }
 }

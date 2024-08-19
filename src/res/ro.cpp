@@ -1,6 +1,8 @@
 #include <functional>
-#include <res/ro.h>
+#include <ranges>
 
+#include <res/ro.h>
+#include <validate.h>
 namespace apkfmt::res {
     Ro::Ro(const std::filesystem::path& androidPath)
         : workDir(androidPath) {
@@ -37,7 +39,9 @@ namespace apkfmt::res {
             if (!exists(destDir)) {
                 create_directories(destDir);
             }
-            copy_file(target, destDir / target.filename());
+            const auto destFile{destDir / target.filename()};
+            copy_file(target, destFile);
+            Validate::collideFiles(target, destFile);
             std::filesystem::remove(target);
         }
     }

@@ -60,7 +60,7 @@ namespace apkfmt {
     void Repack::pack() const {
         constexpr auto zipLevelStore{0};
         std::string output{backing.apk.stem()};
-        output += "-Zipped.apk";
+        output += "-compressed.apk";
         const auto zip{zip_open(output.c_str(), zipLevelStore, 'w')};
 
         std::function<void(const std::filesystem::path&)> walk = [&](const auto& path) {
