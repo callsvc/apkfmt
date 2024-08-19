@@ -1,5 +1,3 @@
-#include <types.h>
-
 #include <holder.h>
 #include <repack.h>
 using namespace apkfmt;
@@ -14,7 +12,7 @@ auto main(const i32 argc, char** argv) -> i32 {
     Repack repack{holder};
 
     repack.unpack();
-    repack.pack();
+    // repack.pack();
 
     return {};
 }

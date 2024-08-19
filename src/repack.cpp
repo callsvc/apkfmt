@@ -44,8 +44,10 @@ namespace apkfmt {
                 Holder::increaseFSz(entryPath, ioSize);
             }
 
-            chunkBuffer.resize(ioSize);
-            zip_entry_noallocread(zip, chunkBuffer.data(), chunkBuffer.size());
+            if (chunkBuffer.size() < ioSize)
+                chunkBuffer.resize(ioSize);
+            zip_entry_noallocread(zip, &chunkBuffer[0], ioSize);
+            io.write(reinterpret_cast<char*>(&chunkBuffer[0]), static_cast<std::streamsize>(ioSize));
             if (io.is_open()) {
                 io.close();
             }
@@ -68,7 +70,7 @@ namespace apkfmt {
             for (const auto& entry : filter) {
                 const std::string rfs{entry.path()};
                 auto iterator{std::find_if(rfs.begin(), rfs.end(), [](auto it) { return it == '/'; })};
-                iterator.operator++();
+                std::advance(iterator, 1);
                 if (!entry.is_regular_file()) {
                     walk(entry);
                 }
