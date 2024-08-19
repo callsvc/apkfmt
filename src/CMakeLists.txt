@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.21)
 add_executable(apkfmt)
 target_sources(apkfmt PRIVATE
     types.h
+    res/manifest.cpp
+    res/manifest.h
+    res/ro.cpp
+    res/ro.h
     repack.cpp
     repack.h
     holder.cpp

@@ -35,7 +35,7 @@ namespace apkfmt {
                     create_directory(entryPath);
                 continue;
             }
-            auto ioSize{zip_entry_size(zip)};
+            const auto ioSize{zip_entry_size(zip)};
             std::fstream io{entryPath};
             if (!is_regular_file(entryPath)) {
                 create_directories(entryPath.parent_path());
@@ -47,6 +47,7 @@ namespace apkfmt {
             if (chunkBuffer.size() < ioSize)
                 chunkBuffer.resize(ioSize);
             zip_entry_noallocread(zip, &chunkBuffer[0], ioSize);
+            // ReSharper disable once CppRedundantCastExpression
             io.write(reinterpret_cast<char*>(&chunkBuffer[0]), static_cast<std::streamsize>(ioSize));
             if (io.is_open()) {
                 io.close();

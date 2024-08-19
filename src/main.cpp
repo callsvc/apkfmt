@@ -1,5 +1,7 @@
 #include <holder.h>
 #include <repack.h>
+
+#include <res/ro.h>
 using namespace apkfmt;
 auto main(const i32 argc, char** argv) -> i32 {
     Holder holder;
@@ -12,6 +14,8 @@ auto main(const i32 argc, char** argv) -> i32 {
     Repack repack{holder};
 
     repack.unpack();
+    res::Ro readOnlyOutput{holder.output};
+    readOnlyOutput.groupResources();
     // repack.pack();
 
     return {};
