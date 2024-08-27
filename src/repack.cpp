@@ -3,8 +3,6 @@
 #include <functional>
 #include <ranges>
 
-#include <zip.h>
-
 #include <repack.h>
 #include <validate.h>
 namespace apkfmt {
@@ -16,6 +14,17 @@ namespace apkfmt {
             std::terminate();
 
         Validate::doChecksum(stream, holder.apk);
+    }
+
+    void Repack::handleObfuscatedManifest(zip_t* entry) const {
+        u16 compressionMethod;
+        const std::string& apk{backing.apk};
+        std::fstream input{apk, std::ios::in | std::ios::binary};
+        input.seekg(zip_entry_header_offset(entry) + 0x8);
+        input.read(reinterpret_cast<char*>(&compressionMethod), sizeof(compressionMethod));
+
+        if (compressionMethod == 0x8) {
+        }
     }
 
     void Repack::unpack() {
@@ -46,6 +55,9 @@ namespace apkfmt {
 
             if (chunkBuffer.size() < ioSize)
                 chunkBuffer.resize(ioSize);
+            if (entryPath.filename() == "AndroidManifest.xml") {
+                handleObfuscatedManifest(zip);
+            }
             zip_entry_noallocread(zip, &chunkBuffer[0], ioSize);
             // ReSharper disable once CppRedundantCastExpression
             io.write(reinterpret_cast<char*>(&chunkBuffer[0]), static_cast<std::streamsize>(ioSize));

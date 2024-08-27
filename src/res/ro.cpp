@@ -87,7 +87,7 @@ namespace apkfmt::res {
         }
 
         android = Manifest(files);
-        // android.decode();
+        android.decode();
         android.save(workDir / manifestAlias);
     }
 }

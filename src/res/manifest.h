@@ -8,7 +8,7 @@ namespace apkfmt::res {
         Manifest() = default;
         explicit Manifest(const std::vector<std::filesystem::path>& res);
 
-        static void decode();
+        void decode();
         void save(const std::filesystem::path& output) const;
     private:
         std::vector<char> chunk;
