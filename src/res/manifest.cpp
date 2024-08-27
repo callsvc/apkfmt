@@ -6,8 +6,8 @@ namespace apkfmt::res {
     Manifest::Manifest(const std::vector<std::filesystem::path>& res) {
         auto readManifest = [&] (const std::filesystem::path& path) {
             std::fstream meta{path, std::ios::in};
-            chunk.resize(file_size(path));
-            meta.read(&chunk[0], static_cast<std::streamsize>(file_size(path)));
+            content.resize(file_size(path));
+            meta.read(&content[0], static_cast<std::streamsize>(file_size(path)));
 
             meta.close();
         };
@@ -22,20 +22,20 @@ namespace apkfmt::res {
     }
 
     void Manifest::decode() {
-        xml::Decoder xmlBinaryDealer{chunk};
+        xml::Decoder xmlBinaryDealer{content};
         std::stringstream xml;
         xmlBinaryDealer.reconstructXml(xml);
 
         xml.seekg(std::ios::end);
         const auto size{xml.tellg()};
         xml.seekg(std::ios::beg);
-        chunk.resize(size);
+        content.resize(size);
 
-        xml.read(&chunk[0], size);
+        xml.read(&content[0], size);
     }
     void Manifest::save(const std::filesystem::path& output) const {
         std::ofstream meta{output, std::ios::out};
-        meta.write(&chunk[0], static_cast<std::streamsize>(chunk.size()));
+        meta.write(&content[0], static_cast<std::streamsize>(content.size()));
         meta.close();
     }
 }

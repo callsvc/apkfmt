@@ -15,6 +15,8 @@ add_subdirectory(external/mbedtls)
 include_directories(external/mbedtls/include)
 target_compile_options(mbedcrypto PRIVATE -Wno-everything)
 
+add_subdirectory(external/boost)
+
 include_directories(src)
 add_executable(apkfmt)
 add_subdirectory(src)

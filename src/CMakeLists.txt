@@ -22,4 +22,4 @@ target_sources(apkfmt PRIVATE
     validate.cpp
     validate.h
 )
-target_link_libraries(apkfmt zip mbedcrypto)
+target_link_libraries(apkfmt zip mbedcrypto Boost::property_tree)

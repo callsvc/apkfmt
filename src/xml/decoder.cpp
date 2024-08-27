@@ -1,19 +1,22 @@
-#include <xml/decoder.h>
+#include <boost/property_tree/xml_parser.hpp>
 
+#include <xml/decoder.h>
 #include <arsc/axml_parser.h>
 namespace apkfmt::xml {
     Decoder::Decoder(std::vector<char>& buffer) : content(buffer) {
-        for (const auto& ordered : content) {
-            fixed.put(ordered);
+        encoded.write(&content[0], content.size());
+        encoded.seekg(std::ios::beg);
+
+        if (encoded.peek() != 0x3) {
+            read_xml(encoded, root, boost_pt::xml_parser::trim_whitespace);
         }
-        fixed.seekg(std::ios::beg);
-        [[maybe_unused]] arsc::AxmlParser parser;
-        auto test{arsc::AxmlParser::getAttrString(100)};
+        arsc::AxmlParser parser;
     }
 
     void Decoder::reconstructXml(std::stringstream& output) const {
-        output << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-        if (fixed.view().empty()) {
+        if (encoded.view().empty()) {
         }
+        const boost_pt::xml_writer_settings<std::string> settings(' ', 2);
+        write_xml(output, root, settings);
     }
 }

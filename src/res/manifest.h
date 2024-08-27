@@ -11,7 +11,7 @@ namespace apkfmt::res {
         void decode();
         void save(const std::filesystem::path& output) const;
     private:
-        std::vector<char> chunk;
+        std::vector<char> content;
     };
     inline const std::string manifestAlias{"AndroidManifest.xml"};
 }

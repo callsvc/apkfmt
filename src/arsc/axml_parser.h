@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+
 #include <types.h>
 namespace apkfmt::arsc {
     enum ResourceType : u16 {
@@ -10,7 +12,7 @@ namespace apkfmt::arsc {
     class AxmlParser {
     public:
         AxmlParser();
-
-        static std::string getAttrString(u16 index);
+        std::vector<std::string> attributes;
+        std::string getAttrString(u16 index);
     };
 }

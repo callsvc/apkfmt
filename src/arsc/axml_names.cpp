@@ -5,7 +5,6 @@
 #include <arsc/axml_parser.h>
 namespace apkfmt::arsc {
     std::string AxmlParser::getAttrString(const u16 index) {
-        static std::vector<std::string> attributes;
         [[unlikely]] if (attributes.empty()) {
             std::filesystem::path attrs{"android_attributes_list.txt"};
             if (std::getenv("APKFMT_ATTRS_PATH") != nullptr) {
