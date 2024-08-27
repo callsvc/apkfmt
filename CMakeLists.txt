@@ -15,4 +15,14 @@ add_subdirectory(external/mbedtls)
 include_directories(external/mbedtls/include)
 target_compile_options(mbedcrypto PRIVATE -Wno-everything)
 
+include_directories(src)
+add_executable(apkfmt)
 add_subdirectory(src)
+
+add_custom_command(
+    TARGET apkfmt POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    "${CMAKE_SOURCE_DIR}/android_attributes_list.txt"
+    "$<TARGET_FILE_DIR:apkfmt>/android_attributes_list.txt"
+)
+

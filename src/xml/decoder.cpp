@@ -8,6 +8,7 @@ namespace apkfmt::xml {
         }
         fixed.seekg(std::ios::beg);
         [[maybe_unused]] arsc::AxmlParser parser;
+        auto test{arsc::AxmlParser::getAttrString(100)};
     }
 
     void Decoder::reconstructXml(std::stringstream& output) const {
