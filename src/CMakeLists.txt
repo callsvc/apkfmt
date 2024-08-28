@@ -11,6 +11,8 @@ target_sources(apkfmt PRIVATE
     arsc/axml_parser.cpp
     arsc/axml_parser.h
     arsc/axml_names.cpp
+    arsc/stream.cpp
+    arsc/stream.h
     xml/decoder.cpp
     xml/decoder.h
     repack.cpp
@@ -22,4 +24,4 @@ target_sources(apkfmt PRIVATE
     validate.cpp
     validate.h
 )
-target_link_libraries(apkfmt zip mbedcrypto Boost::property_tree)
+target_link_libraries(apkfmt zip mbedcrypto Boost::property_tree Boost::locale Boost::program_options)

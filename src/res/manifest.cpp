@@ -22,16 +22,15 @@ namespace apkfmt::res {
     }
 
     void Manifest::decode() {
-        xml::Decoder xmlBinaryDealer{content};
+        xml::Decoder binaryDealer{content};
         std::stringstream xml;
-        xmlBinaryDealer.reconstructXml(xml);
+        binaryDealer.reconstructXml(xml);
 
-        xml.seekg(std::ios::end);
-        const auto size{xml.tellg()};
+        const auto size{xml.tellp()};
         xml.seekg(std::ios::beg);
         content.resize(size);
 
-        xml.read(&content[0], size);
+        xml.read(&content[0], content.size());
     }
     void Manifest::save(const std::filesystem::path& output) const {
         std::ofstream meta{output, std::ios::out};
