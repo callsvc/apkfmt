@@ -9,9 +9,14 @@ auto main(const i32 argc, char** argv) -> i32 {
     namespace bpo = boost::program_options;
     Holder holder;
     bpo::options_description apkOptions("Usage options");
+
+    std::string outputs;
+    std::string inputs;
     apkOptions.add_options()
-        ("unpack", "")
-        ("pack", "");
+        ("unpack", "Decompress the specified packages")
+        ("input", bpo::value(&inputs), "Specify the path for the input files/directories")
+        ("output", bpo::value(&outputs), "Specify the naming format for the directories or output files")
+        ("pack", "Package the specified directory");
 
     std::vector<char*> args;
     for (i32 argument{}; argument < argc; argument++)
