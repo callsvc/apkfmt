@@ -4,7 +4,7 @@
 
 #include <arsc/axml_parser.h>
 namespace apkfmt::arsc {
-    std::string AxmlParser::getAttrString(u16 index) {
+    std::string AxmlParser::GetAttrString(u16 index) {
         [[unlikely]] if (attributes.empty()) {
             std::filesystem::path attrs{"android_attributes_list.txt"};
             if (std::getenv("APKFMT_ATTRS_PATH") != nullptr) {
@@ -12,10 +12,10 @@ namespace apkfmt::arsc {
             }
             if (exists(attrs)) {
                 std::ifstream read{attrs};
-                std::vector<char> maxAttrName(100);
+                std::vector<char> maxattrs(100);
                 do {
-                    read.getline(&maxAttrName[0], maxAttrName.size());
-                    attributes.emplace_back(&maxAttrName[0]);
+                    read.getline(&maxattrs[0], maxattrs.size());
+                    attributes.emplace_back(&maxattrs[0]);
                 } while (read.gcount());
             }
         }

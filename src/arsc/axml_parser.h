@@ -62,8 +62,7 @@ namespace apkfmt::arsc {
                 const auto value{static_cast<i32>(resource.data & 0xffffff00) * radixMul[frac]};
                 if (frac) {
                     os << value * 100;
-                    const auto fracMode{(resource.data & 0x7)};
-                    if (!fracMode) {
+                    if (const auto fracMode{(resource.data & 0x7)}; !fracMode) {
                         os << "%";
                     } else if (fracMode == 1) {
                         os << "%p";
@@ -128,17 +127,17 @@ namespace apkfmt::arsc {
         static constexpr u16 resTableLibrary{0x0203};
 
         AxmlParser(std::stringstream& stream, bpt::ptree& root);
-        std::string getAttrString(u16 index);
+        std::string GetAttrString(u16 index);
 
-        void parser();
+        void Parser();
     private:
-        void parserStringPool();
-        void parserResourceMap();
-        void parserStartNameSpace();
-        void parserEndNameSpace();
-        void parserStartElement();
-        void parserEndElement();
-        void parserXmlCData();
+        void ParserStringPool();
+        void ParserResourceMap();
+        void ParserStartNameSpace();
+        void ParserEndNameSpace();
+        void ParserStartElement();
+        void ParserEndElement();
+        void ParserXmlCData();
 
         std::optional<Stream> source;
         std::vector<std::string> attributes;
@@ -157,8 +156,8 @@ namespace apkfmt::arsc {
         };
 
         std::vector<XmlStackItem> stack;
-        std::vector<std::string> strTab;
+        std::vector<std::string> strtable;
         std::vector<u32> resourcesIds;
-        ResChunkHeader xmlMain;
+        ResChunkHeader xmlMain{};
     };
 }

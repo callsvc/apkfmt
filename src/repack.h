@@ -7,10 +7,10 @@ namespace apkfmt {
     public:
         explicit Repack(const Holder& holder);
 
-        void unpack();
-        void pack() const;
+        void Unpack();
+        void Pack() const;
     private:
-        bool handleObfuscatedManifest(zip_t* entry, std::fstream& io) const;
+        bool HandleObfuscatedManifest(zip_t* entry, std::fstream& io) const;
 
         Holder backing;
         std::vector<u8> chunkBuffer;

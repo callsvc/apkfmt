@@ -7,18 +7,18 @@ namespace apkfmt::res {
     class Ro {
         public:
         Ro() = default;
-        explicit Ro(const std::filesystem::path& androidPath);
+        explicit Ro(const std::filesystem::path& droidpath);
 
         // Groups all resource files into a specific directory
-        void groupResources();
-        void deobfuscate();
-        void treatManifest(const std::filesystem::path& manifest);
-        void rollback() const;
+        void GroupResources() const;
+        void Deobfuscate();
+        void TreatManifest(const std::filesystem::path& manifest);
+        void Rollback() const;
     private:
-        std::filesystem::path workDir;
+        std::filesystem::path workingdir;
 
         std::vector<std::filesystem::path> content;
         Manifest android;
     };
-    inline const std::string groupDir{"fmtres"};
+    inline const std::string groupdir{"fmtres"};
 }

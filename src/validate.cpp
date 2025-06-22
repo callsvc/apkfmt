@@ -6,7 +6,7 @@
 #include <validate.h>
 #include <types.h>
 namespace apkfmt {
-    void Validate::doChecksum(std::stringstream& stream, const std::filesystem::path& origin) {
+    void Validate::DoChecksum(std::stringstream& stream, const std::filesystem::path& origin) {
         mbedtls_sha256_context aes;
         mbedtls_sha256_init(&aes);
         std::vector<u8> ioAaa(file_size(origin));
@@ -27,12 +27,12 @@ namespace apkfmt {
         mbedtls_sha256_free(&aes);
     }
 
-    void Validate::collideFiles(const std::filesystem::path& dest, const std::filesystem::path& src) {
+    void Validate::CollideFiles(const std::filesystem::path& dest, const std::filesystem::path& src) {
         std::stringstream destStream;
         std::stringstream srcStream;
 
-        doChecksum(destStream, dest);
-        doChecksum(srcStream, src);
+        DoChecksum(destStream, dest);
+        DoChecksum(srcStream, src);
         if (destStream.str() != srcStream.str())
             throw std::runtime_error("Destination and src are different");
     }

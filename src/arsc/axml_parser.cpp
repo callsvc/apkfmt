@@ -3,7 +3,7 @@ namespace apkfmt::arsc {
     AxmlParser::AxmlParser(std::stringstream& stream, bpt::ptree& root) {
         stack.clear();
         source = Stream(stream);
-        source->setPos(0);
+        source->SetPos(0);
 
         stack.emplace_back(root);
 
@@ -12,42 +12,42 @@ namespace apkfmt::arsc {
             return;
         stack.clear();
     }
-    void AxmlParser::parser() {
+    void AxmlParser::Parser() {
         while (u64{*source} < xmlMain.chunkSize) {
             const Stream saved{*source};
 
             const auto [type, header, chunkSize]{source->get<ResChunkHeader>()};
             switch (type) {
                 case resStringPool:
-                    parserStringPool();
+                    ParserStringPool();
                     break;
                 case resXmlResourceMap:
-                    parserResourceMap();
+                    ParserResourceMap();
                     break;
                 case resXmlStartNamespace:
-                    parserStartNameSpace();
+                    ParserStartNameSpace();
                     break;
                 case resXmlEndNamespace:
-                    parserEndNameSpace();
+                    ParserEndNameSpace();
                     break;
                 case resXmlStartElement:
-                    parserStartElement();
+                    ParserStartElement();
                     break;
                 case resXmlEndElement:
-                    parserEndElement();
+                    ParserEndElement();
                     break;
                 case resXmlCData:
-                    parserXmlCData();
+                    ParserXmlCData();
                     break;
                 default: {}
             }
 
             source = saved;
-            source->skip(chunkSize);
+            source->Skip(chunkSize);
         }
     }
 
-    void AxmlParser::parserStringPool() {
+    void AxmlParser::ParserStringPool() {
         source->read<ResChunkHeader>();
 
         const auto stringsCount{source->read<u32>()};
@@ -66,7 +66,7 @@ namespace apkfmt::arsc {
             std::vector<u32> style;
 
             for (const auto& offset : stylesOffset) {
-                source->setPos(stylesStart + sizeof(ResChunkHeader) + offset);
+                source->SetPos(stylesStart + sizeof(ResChunkHeader) + offset);
                 do {
                     auto value{source->read<u32>()};
                     if (value == 0xfffffff)
@@ -81,12 +81,12 @@ namespace apkfmt::arsc {
         for (u32 string{}; string < stringsCount; string++) {
             stringsOffset.emplace_back(source->read<u32>());
         };
-        strTab.clear();
-        strTab.reserve(stringsCount);
+        strtable.clear();
+        strtable.reserve(stringsCount);
 
         for (const auto& offset : stringsOffset) {
             std::string from;
-            source->setPos(stringsStart + sizeof(ResChunkHeader) + offset);
+            source->SetPos(stringsStart + sizeof(ResChunkHeader) + offset);
 
             if (flags & 1 << 8) {
                 // We are dealing with strings in UTF-8 format
@@ -94,19 +94,19 @@ namespace apkfmt::arsc {
                 if (len & 0x80) {
                     source->read<u8>();
                 }
-                from = source->getString(len);
+                from = source->GetString(len);
             } else {
                 auto len{source->read<u16>()};
                 if (len & 0x8000) {
-                    len |= ((len & 0x7fff) << 16) | source->read<u16>();
+                    len |= (len & 0x7fff) << 16 | source->read<u16>();
                 }
-                from = source->getUtf8String(len);
+                from = source->GetUtf8String(len);
             }
-            strTab.emplace_back(std::move(from));
+            strtable.emplace_back(std::move(from));
         }
     }
 
-    void AxmlParser::parserResourceMap() {
+    void AxmlParser::ParserResourceMap() {
         const auto header{source->read<ResChunkHeader>()};
         resourcesIds.clear();
 
@@ -115,36 +115,36 @@ namespace apkfmt::arsc {
             resourcesIds.emplace_back(source->read<u32>());
         }
     }
-    void AxmlParser::parserStartNameSpace() {
-        source->skip(sizeof(ResChunkHeader) + sizeof(u32) * 2);
+    void AxmlParser::ParserStartNameSpace() {
+        source->Skip(sizeof(ResChunkHeader) + sizeof(u32) * 2);
         auto prefix{source->read<u32>()};
         auto uri{source->read<u32>()};
 
         stack.back().namespaces.emplace_back(uri, prefix);
     }
 
-    void AxmlParser::parserEndNameSpace() {
-        source->skip(sizeof(ResChunkHeader) + sizeof(u32) * 4);
+    void AxmlParser::ParserEndNameSpace() {
+        source->Skip(sizeof(ResChunkHeader) + sizeof(u32) * 4);
 
         stack.back().namespaces.pop_back();
     }
 
-    void AxmlParser::parserStartElement() {
+    void AxmlParser::ParserStartElement() {
         using bpt = boost::property_tree::ptree::path_type;
-        source->skip(sizeof(ResChunkHeader) + sizeof(u32) * 3);
+        source->Skip(sizeof(ResChunkHeader) + sizeof(u32) * 3);
 
         const auto name{source->read<u32>()};
-        source->skip(sizeof(u32));
+        source->Skip(sizeof(u32));
         const auto attributesCount{source->read<u16>()};
-        source->skip(sizeof(u16) * 3);
+        source->Skip(sizeof(u16) * 3);
 
         // Creating a new ptree for the new element
-        const auto& poll{strTab[name]};
+        const auto& poll{strtable[name]};
         auto& elementPt{stack.back().element.add(bpt(poll, '`'), "")};
 
         for (const auto& [fst, snd] : stack.back().namespaces) {
             elementPt.add(
-                bpt("<xmlattr>`xmlns:" + strTab[snd], '`'), strTab[fst]);
+                bpt("<xmlattr>`xmlns:" + strtable[snd], '`'), strtable[fst]);
         }
         stack.emplace_back(elementPt);
 
@@ -173,21 +173,21 @@ namespace apkfmt::arsc {
                     break;
                 }
                 if (prefix != 0xffffffff) {
-                    solvedName << strTab[prefix] + ":";
+                    solvedName << strtable[prefix] + ":";
                 }
             }
-            if (strTab[attrName].empty()) {
+            if (strtable[attrName].empty()) {
                 if (attrName > resourcesIds.size())
                     throw std::invalid_argument("Invalid resource id");
 
-                solvedName << getAttrString(resourcesIds[attrName]);
+                solvedName << GetAttrString(resourcesIds[attrName]);
             } else {
-                solvedName << strTab[attrName];
+                solvedName << strtable[attrName];
             }
 
             std::stringstream solvedValue;
             if (attrRawValue != 0xffffffff) {
-                solvedValue << strTab[attrRawValue];
+                solvedValue << strtable[attrRawValue];
             } else {
                 solvedValue << value;
             }
@@ -198,16 +198,16 @@ namespace apkfmt::arsc {
         }
     }
 
-    void AxmlParser::parserEndElement() {
-        source->skip(sizeof(ResChunkHeader) + sizeof(u32) * 4);
+    void AxmlParser::ParserEndElement() {
+        source->Skip(sizeof(ResChunkHeader) + sizeof(u32) * 4);
 
         stack.pop_back();
     }
 
-    void AxmlParser::parserXmlCData() {
-        source->skip(sizeof(ResChunkHeader) + sizeof(u32) * 2);
+    void AxmlParser::ParserXmlCData() {
+        source->Skip(sizeof(ResChunkHeader) + sizeof(u32) * 2);
         const auto text{source->read<u32>()};
-        source->skip(sizeof(u32) * 2);
-        stack.back().element.add("<xmltext>", strTab[text]);
+        source->Skip(sizeof(u32) * 2);
+        stack.back().element.add("<xmltext>", strtable[text]);
     }
 }

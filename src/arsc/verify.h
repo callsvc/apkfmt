@@ -5,6 +5,6 @@
 namespace apkfmt::arsc {
     class Verify {
         public:
-        static bool hasResources(const std::vector<std::filesystem::path>& apkDir);
+        static bool HasResources(const std::vector<std::filesystem::path>& apkdir);
     };
 }

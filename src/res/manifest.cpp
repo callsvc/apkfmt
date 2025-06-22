@@ -21,10 +21,10 @@ namespace apkfmt::res {
         }
     }
 
-    void Manifest::decode() {
+    void Manifest::Decode() {
         xml::Decoder binaryDealer{content};
         std::stringstream xml;
-        binaryDealer.reconstructXml(xml);
+        binaryDealer.ReconstructXml(xml);
 
         const auto size{xml.tellp()};
         xml.seekg(std::ios::beg);
@@ -32,7 +32,7 @@ namespace apkfmt::res {
 
         xml.read(&content[0], content.size());
     }
-    void Manifest::save(const std::filesystem::path& output) const {
+    void Manifest::Export(const std::filesystem::path& output) const {
         std::ofstream meta{output, std::ios::out};
         meta.write(&content[0], static_cast<std::streamsize>(content.size()));
         meta.close();

@@ -29,11 +29,11 @@ namespace apkfmt::arsc {
             return position;
         }
 
-        void setPos(u64 pos);
-        void skip(u64 bytes);
+        void SetPos(u64 pos);
+        void Skip(u64 bytes);
 
-        std::string_view getString(std::streamsize length) const;
-        std::string getUtf8String(std::streamsize length);
+        [[nodiscard]] std::string_view GetString(std::streamsize length) const;
+        std::string GetUtf8String(std::streamsize length);
     private:
         std::vector<u16> buffer;
 

@@ -7,9 +7,9 @@ namespace apkfmt {
     class Holder {
     public:
         Holder() = default;
-        void getHolderArgs(std::vector<char*>& args);
+        void GetHolderArgs(const std::vector<char*>& args);
 
-        static void increaseFSz(const std::filesystem::path& stream, u64 size);
+        static void IncreaseFileSize(const std::filesystem::path& stream, u64 size);
 
         std::filesystem::path apk;
         std::filesystem::path output{"fmtout"};

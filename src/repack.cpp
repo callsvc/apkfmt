@@ -15,10 +15,10 @@ namespace apkfmt {
         if (!is_regular_file(holder.apk))
             std::terminate();
 
-        Validate::doChecksum(stream, holder.apk);
+        Validate::DoChecksum(stream, holder.apk);
     }
 
-    bool Repack::handleObfuscatedManifest(zip_t* entry, std::fstream& io) const {
+    bool Repack::HandleObfuscatedManifest(zip_t* entry, std::fstream& io) const {
         const std::string& apk{backing.apk};
         std::fstream input{apk, std::ios::in | std::ios::binary};
         input.seekg(zip_entry_header_offset(entry));
@@ -35,28 +35,28 @@ namespace apkfmt {
             u32 uncompressed;
             u16 nameLen;
             u16 fieldLen;
-        } eZipHeader;
-        input.read(reinterpret_cast<char*>(&eZipHeader), sizeof(eZipHeader));
+        } ezipheader;
+        input.read(reinterpret_cast<char*>(&ezipheader), sizeof(ezipheader));
         if (zip_is64(entry))
             return {};
 
         namespace be = boost::endian;
-        std::vector<char> filename(be::endian_reverse(eZipHeader.nameLen));
+        std::vector<char> filename(be::endian_reverse(ezipheader.nameLen));
         if (filename.size()) {
             input.read(&filename[0], filename.size());
         }
-        if (eZipHeader.compression == 0x8)
+        if (ezipheader.compression == 0x8)
             return {};
-        input.seekg(be::endian_reverse(eZipHeader.fieldLen), std::ios::cur);
+        input.seekg(be::endian_reverse(ezipheader.fieldLen), std::ios::cur);
 
-        std::vector<char> manifest(be::endian_reverse(eZipHeader.compressed));
+        std::vector<char> manifest(be::endian_reverse(ezipheader.compressed));
         input.read(&manifest[0], manifest.size());
         io.write(&manifest[0], manifest.size());
 
         return true;
     }
 
-    void Repack::unpack() {
+    void Repack::Unpack() {
         const std::string input{backing.apk};
         const std::string output{backing.output};
 
@@ -80,7 +80,7 @@ namespace apkfmt {
                 create_directories(entryPath.parent_path());
                 io.open(entryPath, std::ios::out | std::ios::trunc);
 
-                Holder::increaseFSz(entryPath, ioSize);
+                Holder::IncreaseFileSize(entryPath, ioSize);
                 alreadyExist = {};
             }
             if (chunkBuffer.size() < ioSize)
@@ -90,7 +90,7 @@ namespace apkfmt {
 
             bool decompress{true};
             if (entryPath.filename() == "AndroidManifest.xml") {
-                decompress = !handleObfuscatedManifest(zip, io);
+                decompress = !HandleObfuscatedManifest(zip, io);
             }
             if (decompress) {
                 zip_entry_noallocread(zip, &chunkBuffer[0], ioSize);
@@ -103,7 +103,7 @@ namespace apkfmt {
         zip_close(zip);
     }
 
-    void Repack::pack() const {
+    void Repack::Pack() const {
         constexpr auto zipLevelStore{0};
         std::string output{backing.apk.stem()};
         output += "-compressed.apk";

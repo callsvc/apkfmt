@@ -10,7 +10,7 @@ namespace apkfmt::xml {
     public:
         explicit Decoder(std::vector<char>& buffer);
 
-        void reconstructXml(std::stringstream& output) const;
+        void ReconstructXml(std::stringstream& output) const;
     private:
         std::vector<char>& content;
         std::stringstream encoded;

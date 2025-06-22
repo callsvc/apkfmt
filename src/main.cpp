@@ -14,7 +14,7 @@ struct AssociatedInOutFiles {
     std::string apkOut;
 };
 
-void filterApkNames(std::vector<AssociatedInOutFiles>& result,
+void FilterApkNames(std::vector<AssociatedInOutFiles>& result,
     const std::string_view& filenames,
     const bool input = true) {
     auto associateApkNames = [&](const std::string& name) {
@@ -61,7 +61,7 @@ auto main(const i32 argc, char** argv) -> i32 {
     for (i32 argument{}; argument < argc; argument++)
         args.push_back(argv[argument]);
 
-    holder.getHolderArgs(args);
+    holder.GetHolderArgs(args);
 
     bpo::variables_map vm;
     store(parse_command_line(argc, argv, apkOptions), vm);
@@ -69,8 +69,8 @@ auto main(const i32 argc, char** argv) -> i32 {
 
     std::vector<AssociatedInOutFiles> mapper;
 
-    filterApkNames(mapper, inputs);
-    filterApkNames(mapper, outputs, false);
+    FilterApkNames(mapper, inputs);
+    FilterApkNames(mapper, outputs, false);
 
     for (auto& [apkIn, apkOut] : mapper) {
         auto makeAssociation = [&](std::string& unknown, const std::string& known, const bool directory = true) -> bool {
@@ -107,16 +107,16 @@ auto main(const i32 argc, char** argv) -> i32 {
         Repack packer{holder};
 
         if (vm.contains("unpack")) {
-            packer.unpack();
+            packer.Unpack();
             res::Ro readOnlyDir{holder.output};
-            readOnlyDir.groupResources();
-            readOnlyDir.deobfuscate();
+            readOnlyDir.GroupResources();
+            readOnlyDir.Deobfuscate();
         }
 
         if (vm.contains("pack")) {
             res::Ro readOnlyDir{holder.output};
-            readOnlyDir.rollback();
-            packer.pack();
+            readOnlyDir.Rollback();
+            packer.Pack();
         }
     }
 

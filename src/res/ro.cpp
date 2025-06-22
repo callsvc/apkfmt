@@ -5,11 +5,10 @@
 #include <arsc/verify.h>
 #include <validate.h>
 namespace apkfmt::res {
-    Ro::Ro(const std::filesystem::path& androidPath)
-        : workDir(androidPath) {
+    Ro::Ro(const std::filesystem::path& droidpath)
+        : workingdir(droidpath) {
         std::function<void(const std::filesystem::path&)> grabEverything = [&](const std::filesystem::path& way) {
-            const std::filesystem::directory_iterator walker(way);
-            for (const auto& entry : walker) {
+            for (const std::filesystem::directory_iterator walker(way); const auto& entry : walker) {
                 if (entry.is_directory()) {
                     grabEverything(entry.path());
                     continue;
@@ -17,16 +16,16 @@ namespace apkfmt::res {
                 content.emplace_back(entry.path());
             }
         };
-        grabEverything(androidPath);
+        grabEverything(droidpath);
     }
 
-    void Ro::groupResources() {
+    void Ro::GroupResources() const {
         static std::array clusterFiles{
-            manifestAlias
+            manifestalias
         };
         std::vector<std::string> remain;
         for (const auto& copyable : clusterFiles) {
-            if (!exists(workDir / groupDir / copyable)) {
+            if (!exists(workingdir / groupdir / copyable)) {
                 remain.push_back(copyable);
             }
         }
@@ -42,13 +41,13 @@ namespace apkfmt::res {
             if (!chosen)
                 continue;
 
-            std::filesystem::path destDir{workDir / groupDir};
+            std::filesystem::path destDir{workingdir / groupdir};
             if (!exists(destDir)) {
                 create_directories(destDir);
             }
             const auto destFile{destDir / target.filename()};
             copy_file(target, destFile);
-            Validate::collideFiles(target, destFile);
+            Validate::CollideFiles(target, destFile);
             std::filesystem::remove(target);
 
             std::erase_if(remain, [&](const auto& moveable) {
@@ -58,36 +57,35 @@ namespace apkfmt::res {
                 break;
         }
     }
-    void Ro::rollback() const {
-        const std::filesystem::directory_iterator walker(workDir / groupDir);
-        for (const auto& entry : walker) {
-            const auto mimic{workDir / entry.path().filename()};
+    void Ro::Rollback() const {
+        for (const std::filesystem::directory_iterator walker(workingdir / groupdir); const auto& entry : walker) {
+            const auto mimic{workingdir / entry.path().filename()};
             if (exists(mimic)) {
                 std::filesystem::remove(mimic);
             }
             copy_file(entry, mimic);
-            Validate::collideFiles(entry, mimic);
+            Validate::CollideFiles(entry, mimic);
         }
 
-        remove_all(workDir / groupDir);
+        remove_all(workingdir / groupdir);
     }
 
-    void Ro::deobfuscate() {
-        const std::filesystem::path manifest{workDir / groupDir / manifestAlias};
-        treatManifest(manifest);
+    void Ro::Deobfuscate() {
+        const std::filesystem::path manifest{workingdir / groupdir / manifestalias};
+        TreatManifest(manifest);
     }
 
-    void Ro::treatManifest(const std::filesystem::path& manifest) {
+    void Ro::TreatManifest(const std::filesystem::path& manifest) {
         if (!exists(manifest))
             return;
         std::vector<std::filesystem::path> files;
         files.push_back(manifest);
-        if (arsc::Verify::hasResources(content)) {
-            files.push_back(workDir / "resources.arsc");
+        if (arsc::Verify::HasResources(content)) {
+            files.push_back(workingdir / "resources.arsc");
         }
 
         android = Manifest(files);
-        android.decode();
-        android.save(workDir / manifestAlias);
+        android.Decode();
+        android.Export(workingdir / manifestalias);
     }
 }

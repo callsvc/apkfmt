@@ -9,13 +9,13 @@ namespace apkfmt::xml {
 
         if (encoded.peek() == 0x3) {
             arsc::AxmlParser axml(encoded, root);
-            axml.parser();
+            axml.Parser();
         } else {
             read_xml(encoded, root, boost_pt::xml_parser::trim_whitespace);
         }
     }
 
-    void Decoder::reconstructXml(std::stringstream& output) const {
+    void Decoder::ReconstructXml(std::stringstream& output) const {
         if (encoded.view().empty()) {
             throw std::runtime_error("Empty xml string");
         }
